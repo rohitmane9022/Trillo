@@ -1,4 +1,4 @@
-"use client"; // Ensure it's a client component
+"use client"; 
 
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
@@ -9,10 +9,10 @@ import AddList from "./AddList";
 const Board = () => {
     const [lists, setLists] = useState([]);
     const [isAddingList, setIsAddingList] = useState(false);
-    const [isMounted, setIsMounted] = useState(false); // Prevents hydration issues
+    const [isMounted, setIsMounted] = useState(false); 
 
     useEffect(() => {
-        setIsMounted(true); // Set mounted state to true
+        setIsMounted(true); 
         const savedLists = localStorage.getItem("trelloBoard");
         if (savedLists) {
             setLists(JSON.parse(savedLists));
@@ -66,7 +66,7 @@ const Board = () => {
         localStorage.removeItem("trelloBoard");
     };
 
-    if (!isMounted) return null; // Prevents SSR-related errors
+    if (!isMounted) return null; 
 
     return (
         <div className="flex flex-col h-screen">
@@ -114,4 +114,3 @@ const Board = () => {
 };
 
 export default Board;
-    
