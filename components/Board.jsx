@@ -1,75 +1,72 @@
+"use client"; // Ensure it's a client component
 
-'use client'
-import { Plus, Trash2 } from "lucide-react"
-import { Button } from "./ui/button"
-import ListComponent from "./List"
-import { useState, useEffect } from "react"
-import AddList from "./AddList"
+import { Plus, Trash2 } from "lucide-react";
+import { Button } from "./ui/button";
+import ListComponent from "./List";
+import { useState, useEffect } from "react";
+import AddList from "./AddList";
 
 const Board = () => {
-    const [lists, setLists] = useState([])
-    const [isAddingList, setIsAddingList] = useState(false)
-
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const savedLists = localStorage.getItem('trelloBoard')
-            if (savedLists) {
-                setLists(JSON.parse(savedLists))
-            }
-        }
-    }, []) 
+    const [lists, setLists] = useState([]);
+    const [isAddingList, setIsAddingList] = useState(false);
+    const [isMounted, setIsMounted] = useState(false); // Prevents hydration issues
 
     useEffect(() => {
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('trelloBoard', JSON.stringify(lists))
+        setIsMounted(true); // Set mounted state to true
+        const savedLists = localStorage.getItem("trelloBoard");
+        if (savedLists) {
+            setLists(JSON.parse(savedLists));
         }
-    }, [lists])
+    }, []);
+
+    useEffect(() => {
+        if (isMounted) {
+            localStorage.setItem("trelloBoard", JSON.stringify(lists));
+        }
+    }, [lists, isMounted]);
 
     const addList = (title) => {
-        setLists([...lists, { id: crypto.randomUUID(), title, cards: [] }])
-        setIsAddingList(false)
-    }
+        setLists([...lists, { id: crypto.randomUUID(), title, cards: [] }]);
+        setIsAddingList(false);
+    };
 
     const updateList = (id, title) => {
-        setLists(lists.map((list) => (list.id === id ? { ...list, title } : list)))
-    }
+        setLists(lists.map((list) => (list.id === id ? { ...list, title } : list)));
+    };
 
     const deleteList = (id) => {
-        setLists(lists.filter(list => list.id !== id))
-    }
+        setLists(lists.filter((list) => list.id !== id));
+    };
 
     const addCard = (id, title) => {
-        setLists(lists.map((list) => list.id === id ? { ...list, cards: [...list.cards, { id: crypto.randomUUID(), title }] } : list))
-    }
+        setLists(
+            lists.map((list) =>
+                list.id === id ? { ...list, cards: [...list.cards, { id: crypto.randomUUID(), title }] } : list
+            )
+        );
+    };
 
     const moveCard = (fromListId, toListId, cardId) => {
-        setLists(lists.map(list => {
-            if (list.id === fromListId) {
-                return {
-                    ...list,
-                    cards: list.cards.filter(card => card.id !== cardId)
+        setLists(
+            lists.map((list) => {
+                if (list.id === fromListId) {
+                    return { ...list, cards: list.cards.filter((card) => card.id !== cardId) };
                 }
-            }
-            if (list.id === toListId) {
-                const cardToMove = lists
-                    .find(l => l.id === fromListId)
-                    .cards.find(c => c.id === cardId);
-                return {
-                    ...list,
-                    cards: [...list.cards, cardToMove]
+                if (list.id === toListId) {
+                    const cardToMove = lists.find((l) => l.id === fromListId).cards.find((c) => c.id === cardId);
+                    return { ...list, cards: [...list.cards, cardToMove] };
                 }
-            }
-            return list;
-        }));
-    }
+                return list;
+            })
+        );
+    };
 
     const resetBoard = () => {
-        setLists([])
-        if (typeof window !== 'undefined') {
-            localStorage.removeItem('trelloBoard')
-        }
-    }
+        setLists([]);
+        localStorage.removeItem("trelloBoard");
+    };
+
+    if (!isMounted) return null; // Prevents SSR-related errors
 
     return (
         <div className="flex flex-col h-screen">
@@ -80,11 +77,7 @@ const Board = () => {
                     </div>
                     <h1 className="text-xl font-bold text-gray-800">Trello Board</h1>
                 </div>
-                <Button 
-                    variant="destructive" 
-                    className="flex items-center gap-2"
-                    onClick={resetBoard}
-                >
+                <Button variant="destructive" className="flex items-center gap-2" onClick={resetBoard}>
                     <Trash2 size={16} />
                     Reset Board
                 </Button>
@@ -117,7 +110,8 @@ const Board = () => {
                 </div>
             </main>
         </div>
-    )
-}
+    );
+};
 
-export default Board
+export default Board;
+    
