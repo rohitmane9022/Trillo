@@ -7,16 +7,23 @@ import { useState, useEffect } from "react"
 import AddList from "./AddList"
 
 const Board = () => {
-    const [lists, setLists] = useState(() => {
-       
-        const savedLists = localStorage.getItem('trelloBoard')
-        return savedLists ? JSON.parse(savedLists) : []
-    })
+    const [lists, setLists] = useState([])
     const [isAddingList, setIsAddingList] = useState(false)
 
-    
+
     useEffect(() => {
-        localStorage.setItem('trelloBoard', JSON.stringify(lists))
+        if (typeof window !== 'undefined') {
+            const savedLists = localStorage.getItem('trelloBoard')
+            if (savedLists) {
+                setLists(JSON.parse(savedLists))
+            }
+        }
+    }, []) 
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('trelloBoard', JSON.stringify(lists))
+        }
     }, [lists])
 
     const addList = (title) => {
@@ -59,7 +66,9 @@ const Board = () => {
 
     const resetBoard = () => {
         setLists([])
-        localStorage.removeItem('trelloBoard')
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('trelloBoard')
+        }
     }
 
     return (
